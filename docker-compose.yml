@@ -1,0 +1,9 @@
+
+version: "3"
+services:
+  node-app:
+    image: vrnvoiceoc/node-app:v1.0
+    build: .
+    ports:
+      - "3000:3000"
+    container_name: node-app

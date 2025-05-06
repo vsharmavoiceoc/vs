@@ -33,7 +33,7 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
         script: |
-          docker pull ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          docker stop node-app || true
-          docker rm node-app || true
-          docker run -d --name node-app -p 80:3000 ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          sudo docker pull ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          sudo docker stop node-app || true
+          sudo docker rm node-app || true
+          sudo docker run -d --name node-app -p 80:3000 ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}

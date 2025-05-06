@@ -1,0 +1,39 @@
+name: CI/CD Pipeline - Build, Push, Deploy
+
+on:
+  push:
+    branches:
+      - main  # or your default branch
+
+env:
+  IMAGE_NAME: vrnvoiceoc/node-app
+  IMAGE_TAG: v1.0  # you can auto-increment this later
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+
+    - name: 🐳 Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: 🛠️ Build Docker image
+      run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+    - name: 📤 Push Docker image
+      run: docker push $IMAGE_NAME:$IMAGE_TAG
+
+    - name: 🚀 Deploy on Server via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        script: |
+          docker pull $IMAGE_NAME:$IMAGE_TAG
+          docker stop node-app || true
+          docker rm node-app || true
+          docker run -d --name node-app -p 80:3000 $IMAGE_NAME:$IMAGE_TAG
